@@ -1,3 +1,4 @@
+# %load python/netvlad_tf/image_descriptor.py
 import cv2
 import glob
 import numpy as np
@@ -44,3 +45,15 @@ class ImageDescriptor(object):
             descs = descs + list(self.sess.run(
                     self.net_out, feed_dict={self.tf_batch: batch}))
         return descs
+
+    def describeImage(self, image, verbose=False):
+        ''' returns descriptors '''
+        if self.is_grayscale:
+            assert len(image.shape)==2, 'Wrong image format... should be grayscale'
+            batch = np.expand_dims(np.expand_dims(image, axis=0), axis=-1)
+        else:
+            assert image.shape[2]==3, 'Wrong image format... should be RGB'
+            batch = np.expand_dims(image, axis=0)
+
+#         batch = np.concatenate(image, 0)
+        return self.sess.run(self.net_out, feed_dict={self.tf_batch: batch})    
